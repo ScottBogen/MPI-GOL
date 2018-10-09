@@ -26,21 +26,24 @@ typedef struct Cell {
 }Cell;
 
 
-int FindNorth(Cell* subgrid, int index, int* top);
-int FindNorthEast(Cell* subgrid, int index, int* top);
-int FindEast(Cell* subgrid, int index);
-int FindSouthEast(Cell* subgrid, int index, int* bottom);
-int FindSouth(Cell* subgrid, int index, int* bottom);
-int FindSouthWest(Cell* subgrid, int index, int* bottom);
-int FindWest(Cell* subgrid, int index);
-int FindNorthWest(Cell* subgrid, int index, int* top);
+Cell* FindNorth(subgrid, cell, index, top);
+Cell* FindNorthEast(subgrid, cell, index, top);
+Cell* FindEast(subgrid, cell, index);
+Cell* FindSouthEast(subgrid, cell, index, bottom);
+Cell* FindSouth(subgrid, cell, index, bottom);
+Cell* FindSouthWest(subgrid, cell, index, bottom);
+Cell* FindWest(subgrid, cell, index);
+Cell* FindNorthWest(subgrid, cell, index, top);
+
+
+
+
 
 int main(int argc,char *argv[]) {
     int rank,p;
 
     int n = 8;
 
-    srand(time(NULL));
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);        // current rank
     MPI_Comm_size(MPI_COMM_WORLD, &p);           // # total processes
@@ -56,16 +59,14 @@ int main(int argc,char *argv[]) {
         return 0;
     }
 
-    Cell* subgrid = (Cell*) malloc(sizeof(subgrid) * n*n/p);    // this is each rank's portion of the grid
+    Cell subgrid[n*n/p];    // this is each rank's portion of the grid
     elements_per_row = n;
     elements_per_subgrid = n*n/p;
 
-    printf("elements per row: %d\nelements per subgrid:%d\n\n\n", elements_per_row, elements_per_subgrid);
+    printf("\n\n\n");
 
     GenerateInitialGoL(rank, p, n, subgrid);
     DisplayGoL(rank, p, n, subgrid);
-
-    MPI_Barrier(MPI_COMM_WORLD);
     Simulate(rank, p, n, subgrid);
     DisplayGoL(rank, p, n, subgrid);
 
@@ -99,28 +100,27 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
 	        }
 
         }
+        return;
     }
 
     else {
         // others wait for MPI receive
         int random, i;
-	MPI_Status status;
-        //	printf("Rank #%d awaiting msg\n", rank);
-   	MPI_Recv(&random,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+	    MPI_Status status;
+         //	printf("Rank #%d awaiting msg\n", rank);
+   	    MPI_Recv(&random,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
-        for (i = 0; i < elements_per_subgrid; i++) {
+        for (i = 0; i < n*n/p; i++) {
             int tmp = (rand() % random) + 1;
-            if (tmp%2==0) {
+            if (tmp%2) {
                 subgrid[i].status = DEAD;
                 subgrid[i].next_status = DEAD;
             }
-            else if (tmp%2==1) {
+
+            else {
                 subgrid[i].status = ALIVE;
                 subgrid[i].next_status = ALIVE;
             }
-	    else {
-		printf("WHAT WHAT WHAT WHAT WHAT :::: tmp%2==%d ON INT %d~~~~~\n", tmp%2);
-	    }
 
         }
     }
@@ -129,54 +129,33 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
 void Simulate(int rank, int p, int n, Cell* subgrid) {
     int i;
 
-    MPI_Status status;
-    int* my_top    = (int*) calloc(elements_per_row, sizeof(int));
-    int* my_bottom = (int*) calloc(elements_per_row, sizeof(int));
-    int* top       = (int*) calloc(elements_per_row, sizeof(int));
-    int* bottom    = (int*) calloc(elements_per_row, sizeof(int));
-
-    //Cell* temp;
-    //temp = subgrid;
-
-    //memset(my_top, 50, elements_per_row*sizeof(my_top[0]));
-    //memset(my_bottom, 5, elements_per_row*sizeof(my_bottom[0]));
-    //memset(top, 10, elements_per_row*sizeof(top[0]));
-    //memset(bottom, 20, elements_per_row*sizeof(bottom[0]));
-
+    printf("[%d] Barrier up\n", rank);
+    // block until everybody is ready
     MPI_Barrier(MPI_COMM_WORLD);
+    printf("[%d] Barrier down\n", rank);
 
-    for (i = 0; i < elements_per_row; i++) {
-      if (subgrid[i].status == 0 || subgrid[i].status == 1) {
-	my_top[i] = subgrid[i].status;
-      }
-      else { 
-	printf("ERROR ALERT: subgrid[i].status == %d\n", subgrid[i].status);
-      }
+    // send my subgrid to my top neighbor
+    // MPI_Send(&random, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+    MPI_Send(subgrid, n*n/p, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);
+    // send my subgrid to my bottom neighbor
+    MPI_Send(subgrid, n*n/p, MPI_INT, (rank+1)%p, 0, MPI_COMM_WORLD);
+    printf("[%d] MPI Sent subgrid\n", rank);
 
-      my_top[i] = subgrid[i].status;
-      my_bottom[i] = subgrid[elements_per_subgrid - elements_per_row + i].status;
-    }
-
-    int j;
-    //for (j = 0; j < elements_per_row; j++) {
-    //    printf("[%d] Testing my top[%d].status: %d\n", rank, j, my_top[j]);
-    //}
-
-    MPI_Send(my_top,    elements_per_row, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);
-    MPI_Send(my_bottom, elements_per_row, MPI_INT, (rank+1)%p,   0, MPI_COMM_WORLD);
-    printf("[%d] MPI Sent top and bottom\n", rank);
-
-    //memset(top, 10, elements_per_subgrid*sizeof(top[0]));
-    //memset(bottom, 20, elements_per_subgrid*sizeof(bottom[0]));
+    MPI_Status status;
+    Cell top[n*n/p];
+    Cell bottom[n*n/p];
 
     // receive my top and bottom neighbor's subgrids
-    MPI_Recv(top, elements_per_row, MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-    MPI_Recv(bottom, elements_per_row, MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-    printf("[%d] MPI Received top/bottom\n", rank);
+    MPI_Recv(top,n*n/p,MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+    MPI_Recv(bottom,n*n/p,MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
-    for (j = 0; j < elements_per_row; j++) {
-        printf("[%d] Testing top[%d]: %d\n",rank, j, top[j]);
+    printf("[%d] MPI Received subgrid\n", rank);
+    int j;
+    for (j = 0; j < n*n/p; j++) {
+        printf("[%d] Testing top[%d].status: %d\n",rank, j, top[j].status);
     }
+
+
     printf("[%d] Barrier up #2\n", rank);
     // block until everybody is ready
     MPI_Barrier(MPI_COMM_WORLD);
@@ -184,7 +163,7 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 
 
     for (i = 0; i < n*n/p; i++) {
-      int sum = AnalyzeNeighbors(subgrid, &subgrid[i], i, top, bottom);
+      int sum = AnalyzeNeighbors(subgrid, subgrid[i], i, top, bottom);
       if (sum < 3 || sum > 5) {
         subgrid[i].next_status = DEAD;
       }
@@ -192,21 +171,19 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
         subgrid[i].next_status = ALIVE;
       }
     }
-
-    // free 4 arrs
-
 }
 
-int AnalyzeNeighbors(Cell* subgrid, Cell* cell, int index, int* top, int* bottom) {
+int AnalyzeNeighbors(Cell* subgrid, Cell* cell, int index, Cell* top, Cell* bottom) {
+	// todo: remove cell from each call, it's not needed 
+    cell->N  = FindNorth(subgrid, cell, index, top);
+    cell->NE = FindNorthEast(subgrid, cell, index, top);
+    cell->E  = FindEast(subgrid, cell, index);
+    cell->SE = FindSouthEast(subgrid, cell, index, bottom);
+    cell->S  = FindSouth(subgrid, cell, index, bottom);
+    cell->SW = FindSouthWest(subgrid, cell, index, bottom);
+    cell->W  = FindWest(subgrid, cell, index);
+    cell->NW = FindNorthWest(subgrid, cell, index, top);
 
-    cell->N->status  = FindNorth(subgrid, index, top);
-    cell->NE->status = FindNorthEast(subgrid, index, top);
-    cell->E->status  = FindEast(subgrid, index);
-    cell->SE->status = FindSouthEast(subgrid, index, bottom);
-    cell->S->status  = FindSouth(subgrid, index, bottom);
-    cell->SW->status = FindSouthWest(subgrid, index, bottom);
-    cell->W->status  = FindWest(subgrid, index);
-    cell->NW->status = FindNorthWest(subgrid, index, top);
 
     int sum = 0;
     sum += cell->N->status;
@@ -221,19 +198,19 @@ int AnalyzeNeighbors(Cell* subgrid, Cell* cell, int index, int* top, int* bottom
     return sum;
 }
 
-int FindNorth(Cell* subgrid, int i, int* top) {
-    int temp;
+Cell* FindNorth(Cell* subgrid, Cell* c, int i, Cell* top) {
+    Cell* temp;
     if (i < elements_per_row) {     // at north border
-        temp = top[elements_per_subgrid - (elements_per_row - 1 - i)];
+        temp = &top[elements_per_subgrid - (elements_per_row - 1 - i)];
     }
     else {
-        temp = subgrid[i - elements_per_row].status;
+        temp = &subgrid[i - elements_per_row];
     }
     return temp;
 }
 
-int FindNorthEast(Cell* subgrid, int i, int* top) {
-    int temp;
+Cell* FindNorthEast(Cell* subgrid, Cell* c, int i, Cell* top) {
+    Cell* temp;
     int temp_index;
 
     if (i < elements_per_row) {     // at north border
@@ -250,10 +227,10 @@ int FindNorthEast(Cell* subgrid, int i, int* top) {
         temp_index = i - elements_per_row + 1;  // normal move north
 
         if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &subgrid[temp_index-elements_per_row+1].status;
+            temp = &subgrid[temp_index-elements_per_row+1];
         }
         else {  // normal case
-            temp = &subgrid[temp_index+1].status;
+            temp = &subgrid[temp_index+1];
         }
 
     }
@@ -261,19 +238,19 @@ int FindNorthEast(Cell* subgrid, int i, int* top) {
     return temp;
 }
 
-int FindEast(Cell* subgrid, int i) {
-    int temp;
+Cell* FindEast(Cell* subgrid, Cell* c, int i) {
+    Cell* temp;
     if ((i + 1) % elements_per_row == 0) {  // at east border
-        temp = &subgrid[i - elements_per_row + 1].status;
+        temp = &subgrid[i - elements_per_row + 1];
     }
     else {      // normal case
-        temp = &subgrid[i+1].status;
+        temp = &subgrid[i+1];
     }
     return temp;
 }
 
-int FindSouthEast(Cell* subgrid, int i, int* bottom) {
-    int temp;
+Cell* FindSouthEast(Cell* subgrid, Cell* c, int i, Cell* bottom) {
+    Cell* temp;
     int temp_index;
 
     // SOUTH
@@ -291,11 +268,12 @@ int FindSouthEast(Cell* subgrid, int i, int* bottom) {
     else {
         temp_index = i + elements_per_row;  // normal move south
 
+
         if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &subgrid[temp_index-elements_per_row+1].status;  // wrap around
+            temp = &subgrid[temp_index-elements_per_row+1];  // wrap around
         }
         else {  // normal case
-            temp = &subgrid[temp_index+1].status;
+            temp = &subgrid[temp_index+1];
         }
 
     }
@@ -303,19 +281,19 @@ int FindSouthEast(Cell* subgrid, int i, int* bottom) {
     return temp;
 }
 
-int FindSouth(Cell* subgrid, int i, int* bottom) {
-    int temp;
+Cell* FindSouth(Cell* subgrid, Cell* c, int i, Cell* bottom) {
+    Cell* temp;
     if (i >= elements_per_subgrid - elements_per_row) {     // at north border
         temp = &bottom[i%elements_per_row];
     }
     else {
-        temp = &subgrid[i + elements_per_row].status;
+        temp = &subgrid[i + elements_per_row];
     }
     return temp;
 }
 
-int FindSouthWest(Cell* subgrid, int i, int* bottom) {
-  int temp;
+Cell* FindSouthWest(Cell* subgrid, Cell* c, int i, Cell* bottom) {
+  Cell* temp;
   int temp_index;
 
   // SOUTH
@@ -336,10 +314,10 @@ int FindSouthWest(Cell* subgrid, int i, int* bottom) {
 
       // WEST
       if (temp_index % elements_per_row == 0) {    // at west border
-          temp = &subgrid[temp_index + elements_per_row - 1].status;
+          temp = &subgrid[temp_index + elements_per_row - 1];
       }
       else {
-          temp = &subgrid[temp_index - 1].status;
+          temp = &subgrid[temp_index - 1];
       }
 
   }
@@ -347,20 +325,20 @@ int FindSouthWest(Cell* subgrid, int i, int* bottom) {
   return temp;
 }
 
-int FindWest(Cell* subgrid, int i) {
-    int temp;
+Cell* FindWest(Cell* subgrid, Cell* c, int i) {
+    Cell* temp;
 
     if (i % elements_per_row == 0) {    // at west border
-        temp = &subgrid[i + elements_per_row - 1].status;
+        temp = &subgrid[i + elements_per_row - 1];
     }
     else {
-        temp = &subgrid[i - 1].status;
+        temp = &subgrid[i - 1];
     }
     return temp;
 }
 
-int FindNorthWest(Cell* subgrid, int i, int* top) {
-    int temp;
+Cell* FindNorthWest(Cell* subgrid, Cell* c, int i, Cell* top) {
+    Cell* temp;
     int temp_index;
 
     if (i < elements_per_row) {     // at north border
@@ -377,13 +355,12 @@ int FindNorthWest(Cell* subgrid, int i, int* top) {
         temp_index = i - elements_per_row + 1;  // normal move north
 
         if (temp_index % elements_per_row == 0) {    // at west border
-            temp = &subgrid[temp_index + elements_per_row - 1].status;
+            temp = &subgrid[temp_index + elements_per_row - 1];
         }
         else {
-            temp = &subgrid[temp_index - 1].status;
+            temp = &subgrid[temp_index - 1];
         }
     }
-    return temp;
 }
 
 void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
@@ -401,4 +378,59 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
     printf("\n");
     return;
 }
+
+  GNU nano 2.2.6                      File: gol.c                                                    
+
+
+Cell* FindNorthWest(Cell* subgrid, Cell* c, int i, Cell* top) {
+    Cell* temp;
+    int temp_index;
+
+    if (i < elements_per_row) {     // at north border
+        temp_index = elements_per_subgrid - (elements_per_row - 1 - i);
+        if ((temp_index+1) % elements_per_row == 0) { // at east border
+            temp = &top[temp_index-elements_per_row+1];
+        }
+        else {
+            temp = &top[temp_index+1];
+        }
+    }
+
+    else {
+        temp_index = i - elements_per_row + 1;  // normal move north
+
+        if (temp_index % elements_per_row == 0) {    // at west border
+            temp = &subgrid[temp_index + elements_per_row - 1];
+        }
+        else {
+            temp = &subgrid[temp_index - 1];
+        }
+    }
+}
+
+void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
+
+        printf("rank#%d", rank);
+        int i;
+        for (i = 0; i < n*n/p; i++) {
+            if (i%n==0){
+                printf("\n");
+            }
+
+            subgrid[i].status == ALIVE ? printf("X ", 254) : printf("_ ");
+        }
+
+    printf("\n");
+    return;
+}
+
+
+
+
+
+
+
+
+
+^G Get Help     ^O WriteOut     ^R
 
