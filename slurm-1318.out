@@ -1,0 +1,77 @@
+my rank=0
+Rank=0: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+my rank=1
+Rank=1: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+rank#0
+X _ X X X _ X X 
+X _ X X _ X _ X 
+_ X X X X X _ _ 
+X X _ _ X X _ X 
+rank#1
+_ X _ X X _ X X 
+X _ X _ _ X _ _ 
+_ _ X _ X _ X _ 
+X _ _ X _ X _ X 
+[0] MPI Sent top and bottom
+[0] MPI Received top/bottom
+[0] Testing top[0]: 0
+[0] Testing top[1]: 1
+[0] Testing top[2]: 0
+[0] Testing top[3]: 1
+[0] Testing top[4]: 1
+[0] Testing top[5]: 0
+[0] Testing top[6]: 1
+[0] Testing top[7]: 1
+[0] Barrier up #2
+[0] Barrier down #2
+rank#0
+[1] MPI Sent top and bottom
+X _ X X X _ X X 
+X _ X X _ X _ X 
+_ X X X X X _ _ 
+X X _ _ X X _ X 
+[1] MPI Received top/bottom
+[1] Testing top[0]: 1
+[1] Testing top[1]: 0
+[1] Testing top[2]: 1
+[1] Testing top[3]: 1
+[1] Testing top[4]: 1
+[1] Testing top[5]: 0
+[1] Testing top[6]: 1
+[1] Testing top[7]: 1
+[1] Barrier up #2
+[1] Barrier down #2
+rank#1
+_ X _ X X _ X X 
+X _ X _ _ X _ _ 
+_ _ X _ X _ X _ 
+X _ _ X _ X _ X 
+Inconsistency detected by ld.so: dl-close.c: 246: _dl_close_worker: Assertion `imap->l_ns == nsid' failed!
+--------------------------------------------------------------------------
+mpirun has exited due to process rank 0 with PID 29401 on
+node n0000 exiting improperly. There are two reasons this could occur:
+
+1. this process did not call "init" before exiting, but others in
+the job did. This can cause a job to hang indefinitely while it waits
+for all processes to call "init". By rule, if one process calls "init",
+then ALL processes must call "init" prior to termination.
+
+2. this process called "init", but exited without calling "finalize".
+By rule, all processes that call "init" MUST call "finalize" prior to
+exiting or it will be considered an "abnormal termination"
+
+This may have caused other processes in the application to be
+terminated by signals sent by mpirun (as reported here).
+--------------------------------------------------------------------------
