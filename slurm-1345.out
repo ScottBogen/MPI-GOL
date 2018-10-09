@@ -1,0 +1,259 @@
+my rank=0
+Rank=0: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+my rank=1
+Rank=1: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+rank#0
+X _ X X X X _ X 
+X _ _ X X _ X _ 
+_ _ _ X _ X _ X 
+X X _ X X X _ X 
+rank#1
+_ X X X _ _ X _ 
+X _ _ X X X _ _ 
+X _ _ X _ _ _ _ 
+X _ X X X _ _ X 
+[0] MPI Sent top and bottom
+[0] MPI Received top/bottom
+[0] Testing top[0]: 0
+[0] Testing top[1]: 1
+[0] Testing top[2]: 1
+[0] Testing top[3]: 1
+[1] MPI Sent top and bottom
+[0] Testing top[4]: 0
+[0] Testing top[5]: 0
+[0] Testing top[6]: 1
+[0] Testing top[7]: 0
+[0] Barrier up #2
+[1] MPI Received top/bottom
+[1] Testing top[0]: 1
+[1] Testing top[1]: 0
+[1] Testing top[2]: 1
+[1] Testing top[3]: 1
+[0] Barrier down #2
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=0, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[1] Testing top[4]: 1
+[1] Testing top[5]: 1
+[1] Testing top[6]: 0
+[0] Making call to FindNorth(subgrid, index=1, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=2, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[1] Testing top[7]: 1
+[1] Barrier up #2
+[1] Barrier down #2
+[1] Inside of Analyze Neighbors...
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=3, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=4, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=5, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=0, top={1,0,1,1,1,1,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=6, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=1, top={1,0,1,1,1,1,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=7, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=2, top={1,0,1,1,1,1,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=3, top={1,0,1,1,1,1,0,1}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=8, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=9, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=4, top={1,0,1,1,1,1,0,1}
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=10, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=11, top={0,1,1,1,0,0,1,0}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=5, top={1,0,1,1,1,0,0,1}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=12, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=6, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=13, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=7, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=14, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=15, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=16, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=8, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=17, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=9, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=10, top={1,0,1,1,1,0,0,1}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=18, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=19, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=11, top={1,0,1,1,1,0,0,1}
+[0] Inside of Analyze Neighbors...
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=12, top={1,0,1,1,1,0,0,1}
+[0] Making call to FindNorth(subgrid, index=20, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=21, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=13, top={1,0,1,1,1,0,0,1}
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=22, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=23, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=14, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=24, top={0,1,1,1,0,0,1,0}
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=15, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=25, top={0,1,1,1,0,0,1,0}
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=16, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=26, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=27, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=17, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=28, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=18, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=29, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=30, top={0,1,1,1,0,0,1,0}
+[1] Making call to FindNorth(subgrid, index=19, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[0] FINDNORTH executed. returned status = 0
+[0] Inside of Analyze Neighbors...
+[0] Making call to FindNorth(subgrid, index=31, top={0,1,1,1,0,0,1,0}
+[0] FINDNORTH executed. returned status = 1
+[1] Making call to FindNorth(subgrid, index=20, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=21, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=22, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=23, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=24, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=25, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=26, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=27, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 1
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=28, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=29, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=30, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+[1] Inside of Analyze Neighbors...
+[1] Making call to FindNorth(subgrid, index=31, top={1,0,1,1,1,0,0,1}
+[1] FINDNORTH executed. returned status = 0
+Inconsistency detected by ld.so: dl-close.c: 246: _dl_close_worker: Assertion `imap->l_ns == nsid' failed!
+--------------------------------------------------------------------------
+mpirun has exited due to process rank 1 with PID 25093 on
+node n0001 exiting improperly. There are two reasons this could occur:
+
+1. this process did not call "init" before exiting, but others in
+the job did. This can cause a job to hang indefinitely while it waits
+for all processes to call "init". By rule, if one process calls "init",
+then ALL processes must call "init" prior to termination.
+
+2. this process called "init", but exited without calling "finalize".
+By rule, all processes that call "init" MUST call "finalize" prior to
+exiting or it will be considered an "abnormal termination"
+
+This may have caused other processes in the application to be
+terminated by signals sent by mpirun (as reported here).
+--------------------------------------------------------------------------

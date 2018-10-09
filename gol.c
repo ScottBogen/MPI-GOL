@@ -67,14 +67,13 @@ int main(int argc,char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
     Simulate(rank, p, n, subgrid);
-    DisplayGoL(rank, p, n, subgrid);
+    //DisplayGoL(rank, p, n, subgrid);
 
     MPI_Finalize();
     return 0;
 }
 
 void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
-
     if (rank==0) {
 	int i;
         for (i = 1; i < p; i++) {
@@ -143,13 +142,13 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
     //memset(top, 10, elements_per_row*sizeof(top[0]));
     //memset(bottom, 20, elements_per_row*sizeof(bottom[0]));
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
 
     for (i = 0; i < elements_per_row; i++) {
       if (subgrid[i].status == 0 || subgrid[i].status == 1) {
 	my_top[i] = subgrid[i].status;
       }
-      else { 
+      else {
 	printf("ERROR ALERT: subgrid[i].status == %d\n", subgrid[i].status);
       }
 
@@ -177,6 +176,8 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
     for (j = 0; j < elements_per_row; j++) {
         printf("[%d] Testing top[%d]: %d\n",rank, j, top[j]);
     }
+
+
     printf("[%d] Barrier up #2\n", rank);
     // block until everybody is ready
     MPI_Barrier(MPI_COMM_WORLD);
@@ -184,7 +185,7 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 
 
     for (i = 0; i < n*n/p; i++) {
-      int sum = AnalyzeNeighbors(subgrid, &subgrid[i], i, top, bottom);
+      int sum = AnalyzeNeighbors(rank, subgrid, &subgrid[i], i, top, bottom);
       if (sum < 3 || sum > 5) {
         subgrid[i].next_status = DEAD;
       }
@@ -197,8 +198,14 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 
 }
 
-int AnalyzeNeighbors(Cell* subgrid, Cell* cell, int index, int* top, int* bottom) {
+int AnalyzeNeighbors(int rank, Cell* subgrid, Cell* cell, int index, int* top, int* bottom) {
+    printf("[%d] Inside of Analyze Neighbors...\n", rank);
+    printf("[%d] Making call to FindNorth(subgrid, index=%d, top={%d,%d,%d,%d,%d,%d,%d,%d}\n",
+           rank, index, top[0], top[1], top[2], top[3], top[4], top[5], top[6], top[7]);
+    int c  = FindNorth(subgrid, index, top);
+    printf("[%d] FINDNORTH executed. returned status = %d\n", rank, c);
 
+    /* 
     cell->N->status  = FindNorth(subgrid, index, top);
     cell->NE->status = FindNorthEast(subgrid, index, top);
     cell->E->status  = FindEast(subgrid, index);
@@ -217,20 +224,33 @@ int AnalyzeNeighbors(Cell* subgrid, Cell* cell, int index, int* top, int* bottom
     sum += cell->SW->status;
     sum += cell->W->status;
     sum += cell->NW->status;
-
+   
     return sum;
+*/ 
+	return 0; 		// remove sometime 
 }
 
+
+// FIRST CALL:
+// subgrid = [ cell0, cell1, ...]
+// i = 0  
+// top = {1,0,1,0,0,0,0,0}
 int FindNorth(Cell* subgrid, int i, int* top) {
     int temp;
+//      0 < 7   --> TRUE 
     if (i < elements_per_row) {     // at north border
-        temp = top[elements_per_subgrid - (elements_per_row - 1 - i)];
+        //     top[
+        temp = top[i];
     }
     else {
         temp = subgrid[i - elements_per_row].status;
     }
     return temp;
 }
+
+
+
+
 
 int FindNorthEast(Cell* subgrid, int i, int* top) {
     int temp;
