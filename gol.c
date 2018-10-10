@@ -126,21 +126,13 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
 }
 
 void Simulate(int rank, int p, int n, Cell* subgrid) {
-    int i;
+    int i, j;
 
     MPI_Status status;
     int* my_top    = (int*) calloc(elements_per_row, sizeof(int));
     int* my_bottom = (int*) calloc(elements_per_row, sizeof(int));
     int* top       = (int*) calloc(elements_per_row, sizeof(int));
     int* bottom    = (int*) calloc(elements_per_row, sizeof(int));
-
-    //Cell* temp;
-    //temp = subgrid;
-
-    //memset(my_top, 50, elements_per_row*sizeof(my_top[0]));
-    //memset(my_bottom, 5, elements_per_row*sizeof(my_bottom[0]));
-    //memset(top, 10, elements_per_row*sizeof(top[0]));
-    //memset(bottom, 20, elements_per_row*sizeof(bottom[0]));
 
     //MPI_Barrier(MPI_COMM_WORLD);
 
@@ -152,30 +144,23 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 	printf("ERROR ALERT: subgrid[i].status == %d\n", subgrid[i].status);
       }
 
-      my_top[i] = subgrid[i].status;
-      my_bottom[i] = subgrid[elements_per_subgrid - elements_per_row + i].status;
+      my_top[i] = subgrid[i].status;							// first row
+      my_bottom[i] = subgrid[elements_per_subgrid - elements_per_row + i].status;	// last row
     }
 
-    int j;
-    //for (j = 0; j < elements_per_row; j++) {
-    //    printf("[%d] Testing my top[%d].status: %d\n", rank, j, my_top[j]);
-    //}
-
-    MPI_Send(my_top,    elements_per_row, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);
-    MPI_Send(my_bottom, elements_per_row, MPI_INT, (rank+1)%p,   0, MPI_COMM_WORLD);
+    MPI_Send(my_top,    elements_per_row, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);	// previous rank
+    MPI_Send(my_bottom, elements_per_row, MPI_INT, (rank+1)%p,   0, MPI_COMM_WORLD);	// next rank
     printf("[%d] MPI Sent top and bottom\n", rank);
 
-    //memset(top, 10, elements_per_subgrid*sizeof(top[0]));
-    //memset(bottom, 20, elements_per_subgrid*sizeof(bottom[0]));
-
     // receive my top and bottom neighbor's subgrids
-    MPI_Recv(top, elements_per_row, MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-    MPI_Recv(bottom, elements_per_row, MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+    MPI_Recv(bottom, elements_per_row, MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);  // next rank, first row
+    MPI_Recv(top, elements_per_row, MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);	// previous rank, last row
+
     printf("[%d] MPI Received top/bottom\n", rank);
 
-    for (j = 0; j < elements_per_row; j++) {
-        printf("[%d] Testing top[%d]: %d\n",rank, j, top[j]);
-    }
+    //for (j = 0; j < elements_per_row; j++) {
+    //    printf("[%d] Testing top[%d]: %d\n",rank, j, top[j]);
+    //}
 
 
     printf("[%d] Barrier up #2\n", rank);
@@ -195,49 +180,68 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
     }
 
     // free 4 arrs
-
 }
 
 int AnalyzeNeighbors(int rank, Cell* subgrid, Cell* cell, int index, int* top, int* bottom) {
-    printf("[%d] Inside of Analyze Neighbors...\n", rank);
-    printf("[%d] Making call to FindNorth(subgrid, index=%d, top={%d,%d,%d,%d,%d,%d,%d,%d}\n",
-           rank, index, top[0], top[1], top[2], top[3], top[4], top[5], top[6], top[7]);
-    int c  = FindNorth(subgrid, index, top);
-    printf("[%d] FINDNORTH executed. returned status = %d\n", rank, c);
-
     /* 
+    if (rank == 0) {
+    	printf("[%d] Making call to FindEast(subgrid, index=%d, top={%d,%d,%d,%d,%d,%d,%d,%d}\n",
+         	  rank, index, top[0], top[1], top[2], top[3], top[4], top[5], top[6], top[7]);
+    	int c  = FindEast(subgrid, index);
+    	printf("[%d] FINDEAST returned int = %d\n", rank, c);
+    }
+    
+
     cell->N->status  = FindNorth(subgrid, index, top);
+    printf("Finished N\n");
     cell->NE->status = FindNorthEast(subgrid, index, top);
+    printf("Finished NE\n");
     cell->E->status  = FindEast(subgrid, index);
+    printf("Finished E\n");
     cell->SE->status = FindSouthEast(subgrid, index, bottom);
+    printf("Finished SE\n");
     cell->S->status  = FindSouth(subgrid, index, bottom);
     cell->SW->status = FindSouthWest(subgrid, index, bottom);
+    printf("Finished SW\n");
     cell->W->status  = FindWest(subgrid, index);
     cell->NW->status = FindNorthWest(subgrid, index, top);
-
+    printf("\n---Finished all Finds---\n");
+    */ 
     int sum = 0;
-    sum += cell->N->status;
-    sum += cell->NE->status;
-    sum += cell->E->status;
-    sum += cell->SE->status;
-    sum += cell->S->status;
-    sum += cell->SW->status;
-    sum += cell->W->status;
-    sum += cell->NW->status;
-   
+    int k;
+
+    printf("\n---[%d::%d] --- ", rank, index);
+    k = FindNorth(subgrid, index, top);
+    if (k > 0) { printf("North --- "); sum+=k; k=0;}
+    k = FindNorthEast(subgrid, index, top);
+    if (k > 0) { printf("NorthEast --- "); sum+=k; k=0; }
+    k = FindEast(subgrid, index);
+    if (k > 0) { printf("East --- "); sum+=k; k=0; }
+    k = FindSouthEast(subgrid, index, bottom);
+    if (k > 0) { printf("SouthEast --- "); sum+=k; k=0; }
+    k = FindSouth(subgrid, index, bottom);
+    if (k > 0) { printf("South --- "); sum+=k; k=0; }
+    k = FindSouthWest(subgrid, index, bottom);
+    if (k > 0) { printf("SouthWest --- "); sum+=k; k=0; }
+    k = FindWest(subgrid, index);
+    if (k > 0) { printf("West --- "); sum+=k; k=0; }
+    k = FindNorthWest(subgrid, index, top);
+    if (k > 0) { printf("NorthWest --- "); sum+=k; k=0; }
+
+    printf("---[%d::%d]---Sum = %d---\n", rank,index, sum);
+
     return sum;
-*/ 
-	return 0; 		// remove sometime 
 }
 
 
 // FIRST CALL:
 // subgrid = [ cell0, cell1, ...]
-// i = 0  
+// i = 0
 // top = {1,0,1,0,0,0,0,0}
+// return = 1
 int FindNorth(Cell* subgrid, int i, int* top) {
     int temp;
-//      0 < 7   --> TRUE 
+//      0 < 7   --> TRUE
     if (i < elements_per_row) {     // at north border
         //     top[
         temp = top[i];
@@ -249,31 +253,32 @@ int FindNorth(Cell* subgrid, int i, int* top) {
 }
 
 
-
-
-
 int FindNorthEast(Cell* subgrid, int i, int* top) {
     int temp;
     int temp_index;
 
+    //printf("INSIDE NE\n");
+
     if (i < elements_per_row) {     // at north border
-        temp_index = elements_per_subgrid - (elements_per_row - 1 - i);
-        if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &top[temp_index-elements_per_row+1];
+       // printf("A\n");
+        if ((i+1) % elements_per_row == 0) { // at east border
+            temp = top[i -elements_per_row + 1];
+       //     printf("B\n");
         }
         else {
-            temp = &top[temp_index+1];
+            temp = top[i+1];
+       //     printf("C = %d\n", temp);
         }
     }
 
     else {
-        temp_index = i - elements_per_row + 1;  // normal move north
+        temp_index = i - elements_per_row;  // normal move north
 
         if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &subgrid[temp_index-elements_per_row+1].status;
+            temp = subgrid[temp_index-elements_per_row+1].status;
         }
         else {  // normal case
-            temp = &subgrid[temp_index+1].status;
+            temp = subgrid[temp_index+1].status;
         }
 
     }
@@ -284,10 +289,10 @@ int FindNorthEast(Cell* subgrid, int i, int* top) {
 int FindEast(Cell* subgrid, int i) {
     int temp;
     if ((i + 1) % elements_per_row == 0) {  // at east border
-        temp = &subgrid[i - elements_per_row + 1].status;
+        temp = subgrid[i - elements_per_row + 1].status;
     }
     else {      // normal case
-        temp = &subgrid[i+1].status;
+        temp = subgrid[i+1].status;
     }
     return temp;
 }
@@ -301,10 +306,10 @@ int FindSouthEast(Cell* subgrid, int i, int* bottom) {
         temp_index = i % elements_per_row;
 
         if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &bottom[temp_index-elements_per_row+1];
+            temp = bottom[temp_index - elements_per_row + 1];
         }
         else {
-            temp = &bottom[temp_index+1];
+            temp = bottom[temp_index + 1];
         }
     }
 
@@ -312,24 +317,22 @@ int FindSouthEast(Cell* subgrid, int i, int* bottom) {
         temp_index = i + elements_per_row;  // normal move south
 
         if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &subgrid[temp_index-elements_per_row+1].status;  // wrap around
+            temp = subgrid[temp_index - elements_per_row + 1].status;  // wrap around
         }
         else {  // normal case
-            temp = &subgrid[temp_index+1].status;
+            temp = subgrid[temp_index + 1].status;
         }
-
     }
-
     return temp;
 }
 
 int FindSouth(Cell* subgrid, int i, int* bottom) {
     int temp;
     if (i >= elements_per_subgrid - elements_per_row) {     // at north border
-        temp = &bottom[i%elements_per_row];
+        temp = bottom[i % elements_per_row];
     }
     else {
-        temp = &subgrid[i + elements_per_row].status;
+        temp = subgrid[i + elements_per_row].status;
     }
     return temp;
 }
@@ -342,24 +345,23 @@ int FindSouthWest(Cell* subgrid, int i, int* bottom) {
   if (i >= elements_per_subgrid - elements_per_row) {     // at south border
       temp_index = i % elements_per_row;
 
-      if ((temp_index+1) % elements_per_row == 0) { // at east border
-          temp = &bottom[temp_index-elements_per_row+1];
+      if ((temp_index) % elements_per_row == 0) { 	  // at west border
+          temp = bottom[temp_index + elements_per_row - 1];
       }
       else {
-          temp = &bottom[temp_index+1];
+          temp = bottom[temp_index+1];
       }
   }
 
   else {
       temp_index = i + elements_per_row;  // normal move south
 
-
       // WEST
       if (temp_index % elements_per_row == 0) {    // at west border
-          temp = &subgrid[temp_index + elements_per_row - 1].status;
+          temp = subgrid[temp_index + elements_per_row - 1].status;
       }
       else {
-          temp = &subgrid[temp_index - 1].status;
+          temp = subgrid[temp_index - 1].status;
       }
 
   }
@@ -371,10 +373,10 @@ int FindWest(Cell* subgrid, int i) {
     int temp;
 
     if (i % elements_per_row == 0) {    // at west border
-        temp = &subgrid[i + elements_per_row - 1].status;
+        temp = subgrid[i + elements_per_row - 1].status;
     }
     else {
-        temp = &subgrid[i - 1].status;
+        temp = subgrid[i - 1].status;
     }
     return temp;
 }
@@ -384,23 +386,22 @@ int FindNorthWest(Cell* subgrid, int i, int* top) {
     int temp_index;
 
     if (i < elements_per_row) {     // at north border
-        temp_index = elements_per_subgrid - (elements_per_row - 1 - i);
-        if ((temp_index+1) % elements_per_row == 0) { // at east border
-            temp = &top[temp_index-elements_per_row+1];
+        if (i % elements_per_row == 0) {	 // at west border
+            temp = top[i + elements_per_row - 1];
         }
         else {
-            temp = &top[temp_index+1];
+            temp = top[i - 1];
         }
     }
 
     else {
-        temp_index = i - elements_per_row + 1;  // normal move north
+        temp_index = i - elements_per_row;  // normal move north
 
         if (temp_index % elements_per_row == 0) {    // at west border
-            temp = &subgrid[temp_index + elements_per_row - 1].status;
+            temp = subgrid[temp_index + elements_per_row - 1].status;
         }
         else {
-            temp = &subgrid[temp_index - 1].status;
+            temp = subgrid[temp_index - 1].status;
         }
     }
     return temp;
@@ -410,12 +411,16 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
 
 	printf("rank#%d", rank);
 	int i;
-        for (i = 0; i < n*n/p; i++) {
-            if (i%n==0){
+        for (i = 0; i < elements_per_subgrid; i++) {
+            if (i%elements_per_row==0){
                 printf("\n");
             }
 
-            subgrid[i].status == ALIVE ? printf("X ", 254) : printf("_ ");
+	    if (subgrid[i].status == ALIVE) { printf("X "); }
+	    else if (subgrid[i].status == DEAD) { printf("_ "); }
+	    else { printf("? "); }
+
+            //subgrid[i].status == ALIVE ? printf("X ", 254) : printf("_ ");
         }
 
     printf("\n");

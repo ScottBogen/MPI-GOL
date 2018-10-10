@@ -1,0 +1,179 @@
+my rank=0
+Rank=0: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+my rank=1
+Rank=1: number of processes =2
+grid size n*n = 64
+subgrid size n*n/p = 32
+elements per row: 8
+elements per subgrid:32
+
+
+rank#0
+X X X X _ X X _ 
+X _ _ X _ _ X _ 
+_ X _ _ X _ _ _ 
+_ X _ X _ _ X _ 
+rank#1
+X X X X X X _ X 
+X _ X _ _ X _ _ 
+X _ _ X _ _ X _ 
+_ _ _ X _ X _ _ 
+[0] MPI Sent top and bottom
+[0] MPI Received top/bottom
+[0] Barrier up #2
+[1] MPI Sent top and bottom
+[0] Barrier down #2
+
+[1] MPI Received top/bottom
+[1] Barrier up #2
+---[0::0] --- East --- South --- ---[0::0]---Sum = 2---
+
+---[0::1] --- East --- SouthWest --- West --- ---[0::1]---Sum = 3---
+
+---[0::2] --- NorthEast --- East --- SouthEast --- West --- ---[0::2]---Sum = 4---
+
+---[0::3] --- North --- South --- West --- ---[0::3]---Sum = 3---
+
+---[0::4] --- NorthEast --- East --- SouthWest --- West --- NorthWest --- ---[0::4]---Sum = 5---
+
+[1] Barrier down #2
+
+---[0::5] --- North --- East --- SouthEast --- ---[0::5]---Sum = 3---
+
+---[0::6] --- South --- West --- NorthWest --- ---[0::6]---Sum = 3---
+
+---[1::0] --- NorthEast --- East --- South --- West --- ---[1::0]---Sum = 4---
+
+---[0::7] --- East --- SouthEast --- SouthWest --- West --- ---[0::7]---Sum = 4---
+
+---[0::8] --- North --- NorthEast --- SouthEast --- ---[0::8]---Sum = 3---
+
+---[0::9] --- North --- NorthEast --- South --- West --- NorthWest --- ---[0::9]---Sum = 5---
+
+---[0::10] --- North --- NorthEast --- East --- SouthWest --- NorthWest --- ---[0::10]---Sum = 5---
+
+---[0::11] --- North --- SouthEast --- NorthWest --- ---[0::11]---Sum = 3---
+---[1::1] --- North --- East --- SouthEast --- SouthWest --- West --- ---[1::1]---Sum = 5---
+
+---[1::2] --- NorthEast --- East --- South --- West --- NorthWest --- ---[1::2]---Sum = 5---
+
+---[0::12] --- NorthEast --- South --- West --- NorthWest --- ---[0::12]---Sum = 4---
+
+---[0::13] --- North --- NorthEast --- East --- SouthWest --- ---[0::13]---Sum = 4---
+
+
+---[1::3] --- North --- East --- SouthWest --- West --- ---[1::3]---Sum = 4---
+
+---[0::14] --- North --- NorthWest --- ---[0::14]---Sum = 2---
+
+---[0::15] --- NorthEast --- East --- West --- NorthWest --- ---[0::15]---Sum = 4---
+---[1::4] --- East --- SouthEast --- West --- NorthWest --- ---[1::4]---Sum = 4---
+
+---[1::5] --- NorthEast --- South --- West --- ---[1::5]---Sum = 3---
+
+---[0::16] --- North --- East --- SouthEast --- ---[0::16]---Sum = 3---
+
+---[0::17] --- South --- NorthWest --- ---[0::17]---Sum = 2---
+
+
+---[1::6] --- North --- East --- SouthWest --- West --- ---[1::6]---Sum = 4---
+
+---[0::18] --- NorthEast --- SouthEast --- SouthWest --- West --- ---[0::18]---Sum = 4---
+
+---[0::19] --- North --- East --- South --- ---[0::19]---Sum = 3---
+
+---[0::20] --- SouthWest --- NorthWest --- ---[0::20]---Sum = 2---
+
+---[0::21] --- NorthEast --- SouthEast --- West --- ---[0::21]---Sum = 3---
+---[1::7] --- East --- SouthEast --- NorthWest --- ---[1::7]---Sum = 3---
+
+---[1::8] --- North --- NorthEast --- South --- NorthWest --- ---[1::8]---Sum = 4---
+
+
+---[0::22] --- North --- South --- ---[0::22]---Sum = 2---
+
+---[0::23] --- NorthEast --- SouthWest --- NorthWest --- ---[0::23]---Sum = 3---
+
+---[1::9] --- North --- NorthEast --- East --- SouthWest --- West --- NorthWest --- ---[1::9]---Sum = 6---
+
+---[0::24] --- NorthEast --- East --- SouthEast --- South --- SouthWest --- ---[0::24]---Sum = 5---
+
+---[0::25] --- North --- SouthEast --- South --- SouthWest --- ---[0::25]---Sum = 4---
+
+---[0::26] --- East --- SouthEast --- South --- SouthWest --- West --- NorthWest --- ---[0::26]---Sum = 6---
+---[1::10] --- North --- NorthEast --- SouthEast --- NorthWest --- ---[1::10]---Sum = 4---
+
+---[1::11] --- North --- NorthEast --- South --- West --- NorthWest --- ---[1::11]---Sum = 5---
+
+---[1::12] --- North --- NorthEast --- East --- SouthWest --- NorthWest --- ---[1::12]---Sum = 5---
+
+---[0::27] --- NorthEast --- SouthEast --- South --- SouthWest --- ---[0::27]---Sum = 4---
+
+---[0::28] --- North --- SouthEast --- South --- SouthWest --- West --- ---[0::28]---Sum = 5---
+
+
+---[1::13] --- North --- SouthEast --- NorthWest --- ---[1::13]---Sum = 3---
+
+---[0::29] --- East --- South --- NorthWest --- ---[0::29]---Sum = 3---
+
+---[0::30] --- SouthEast --- SouthWest --- ---[0::30]---Sum = 2---
+
+---[0::31] --- SouthEast --- South --- West --- ---[0::31]---Sum = 3---
+---[1::14] --- NorthEast --- South --- West --- NorthWest --- ---[1::14]---Sum = 4---
+
+---[1::15] --- North --- NorthEast --- East --- SouthEast --- SouthWest --- ---[1::15]---Sum = 5---
+
+---[1::16] --- North --- ---[1::16]---Sum = 1---
+
+---[1::17] --- NorthEast --- West --- NorthWest --- ---[1::17]---Sum = 3---
+
+---[1::18] --- North --- East --- SouthEast --- ---[1::18]---Sum = 3---
+
+---[1::19] --- South --- NorthWest --- ---[1::19]---Sum = 2---
+
+---[1::20] --- NorthEast --- SouthEast --- SouthWest --- West --- ---[1::20]---Sum = 4---
+
+---[1::21] --- North --- East --- South --- ---[1::21]---Sum = 3---
+
+---[1::22] --- SouthWest --- NorthWest --- ---[1::22]---Sum = 2---
+
+---[1::23] --- NorthEast --- East --- West --- ---[1::23]---Sum = 3---
+
+---[1::24] --- North --- SouthEast --- South --- ---[1::24]---Sum = 3---
+
+---[1::25] --- SouthEast --- South --- SouthWest --- NorthWest --- ---[1::25]---Sum = 4---
+
+---[1::26] --- NorthEast --- East --- SouthEast --- South --- SouthWest --- ---[1::26]---Sum = 5---
+
+---[1::27] --- North --- South --- ---[1::27]---Sum = 2---
+
+---[1::28] --- East --- SouthEast --- SouthWest --- West --- NorthWest --- ---[1::28]---Sum = 5---
+
+---[1::29] --- NorthEast --- SouthEast --- South --- SouthWest --- ---[1::29]---Sum = 4---
+
+---[1::30] --- North --- South --- West --- ---[1::30]---Sum = 3---
+
+---[1::31] --- NorthEast --- SouthEast --- NorthWest --- ---[1::31]---Sum = 3---
+Inconsistency detected by ld.so: dl-close.c: 246: _dl_close_worker: Assertion `imap->l_ns == nsid' failed!
+--------------------------------------------------------------------------
+mpirun has exited due to process rank 0 with PID 10121 on
+node n0004 exiting improperly. There are two reasons this could occur:
+
+1. this process did not call "init" before exiting, but others in
+the job did. This can cause a job to hang indefinitely while it waits
+for all processes to call "init". By rule, if one process calls "init",
+then ALL processes must call "init" prior to termination.
+
+2. this process called "init", but exited without calling "finalize".
+By rule, all processes that call "init" MUST call "finalize" prior to
+exiting or it will be considered an "abnormal termination"
+
+This may have caused other processes in the application to be
+terminated by signals sent by mpirun (as reported here).
+--------------------------------------------------------------------------
