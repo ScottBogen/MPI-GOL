@@ -28,19 +28,24 @@ int FindNorthWest(Cell* subgrid, int index, int* top);
 
 int main(int argc,char *argv[]) {
     int rank,p;
-    int n = 16;
-    int g = 100;
+
+    int n = 16;		// cells per row (grid = n*n)
+    int g = 100;	// # generations
     int i;
 
     srand(time(NULL));
+
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);        // current rank
     MPI_Comm_size(MPI_COMM_WORLD, &p);           // # total processes
 
-    printf("my rank=%d\n",rank);
-    printf("Rank=%d: number of processes =%d\n",rank,p);
-    printf("grid size n*n = %d\n", n*n);
-    printf("subgrid size n*n/p = %d\n", n*n/p);
+    if (rank == 0) {
+    	printf("Init Settings:\n-------------\n");
+    	printf("Number of processes =%d\n",p);
+   	printf("Grid size n*n = %d\n", n*n);
+    	printf("Subgrid size n*n/p = %d\n", n*n/p);
+    }
+
     assert(p>=2);
 
     if (!(n%p==0)) {
@@ -52,25 +57,17 @@ int main(int argc,char *argv[]) {
     elements_per_row = n;
     elements_per_subgrid = n*n/p;
 
-    printf("elements per row: %d\nelements per subgrid:%d\n\n\n", elements_per_row, elements_per_subgrid);
-
     GenerateInitialGoL(rank, p, n, subgrid);
-    //DisplayGoL(rank, p, n, subgrid);
-
 
     // for each generation:
-    for (i = 0; i < g; i++) {
+    for (i = 0; i <= g; i++) {
     	MPI_Barrier(MPI_COMM_WORLD);
 	Simulate(rank, p, n, subgrid);
 	Update(subgrid);
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	if  (i % 10 == 0) {
-	    if (rank == 0) {
-	        printf("Grid at generation#%d:\n", i);
-	    }
-            DisplayGoL(rank, p, n, subgrid);
-	    printf("\n");
+            DisplayGoL(rank, p, n, subgrid, i);
 	}
     }
 
@@ -95,7 +92,7 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
             MPI_Send(&random, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
 
-        // just for rank0
+        // just for rank0, since sending/receiving to itself is pointless
         int random = (rand() % 93563) + 1;
         for (i = 0; i < elements_per_subgrid; i++) {
             int tmp = rand() % random;
@@ -122,7 +119,7 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
 
         for (i = 0; i < elements_per_subgrid; i++) {
             int tmp = (rand() % random) + 1;
-            if (tmp%2==0) {
+            if (tmp%2) {
                 subgrid[i].status = DEAD;
                 subgrid[i].next_status = DEAD;
             }
@@ -384,7 +381,7 @@ int FindNorthWest(Cell* subgrid, int i, int* top) {
     return temp;
 }
 
-void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
+void DisplayGoL(int rank, int p, int n, Cell* subgrid, int g) {
 	int dummy;
 	MPI_Status status;
 	int j, i;
@@ -424,6 +421,7 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
 
                 // fullgrid is now filled up, let's print it out now
 
+		printf("Full grid at generation #%d:", g);
 		for (j = 0; j < p; j++) {
 			for (i = 0; i < elements_per_subgrid; i++) {
                     		if (i%elements_per_row==0) {
@@ -435,6 +433,7 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid) {
            	    		else { printf("? "); }	// this shouldn't happen
 			}
 		}
+		printf("\n\n");
 
         }
 

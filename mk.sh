@@ -1,7 +1,7 @@
 #!/bin/bash
 find . -type f -name slurm\* -exec rm {} \;
 mpicc -w -o golo gol.c
-sbatch -N4 --time=00:02:00 send.sh
+sbatch -N2 --time=00:02:00 send.sh
 
 #while [ ! find . -maxdepth 1 -name "*slurm*"]
 #do
