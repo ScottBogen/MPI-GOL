@@ -1,0 +1,242 @@
+my rank=0
+Rank=0: number of processes =4
+grid size n*n = 256
+subgrid size n*n/p = 64
+elements per row: 16
+elements per subgrid:64
+
+
+my rank=2
+Rank=2: number of processes =4
+my rank=1
+Rank=1: number of processes =4
+grid size n*n = 256
+subgrid size n*n/p = 64
+elements per row: 16
+elements per subgrid:64
+
+
+my rank=3
+Rank=3: number of processes =4
+grid size n*n = 256
+subgrid size n*n/p = 64
+elements per row: 16
+elements per subgrid:64
+
+
+grid size n*n = 256
+subgrid size n*n/p = 64
+elements per row: 16
+elements per subgrid:64
+
+
+Grid at generation#0:
+
+_ X X X X X X X _ X _ X X X _ _ 
+
+
+
+X _ X X X X _ _ _ X X X X X _ X 
+X X X X X X X X X _ X X X X X X 
+X X X X X X X _ _ _ _ _ _ X X X 
+X X X _ X X X X X _ _ X X X X _ 
+X X _ X X _ X X X X _ _ _ X X X 
+X X _ _ _ X X X X X X X X _ X X 
+X X _ _ X X X X X X X _ X _ X _ 
+X _ X X X X _ X X X X X X _ _ X 
+X _ X X _ X X X X _ _ X X X _ X 
+X _ X _ X _ X X _ _ _ X X _ _ X 
+X _ _ _ X X X _ _ _ _ _ X X X X 
+X _ X _ _ X X X _ X X X X _ X X 
+X _ X X X X _ X X _ _ X X _ X X 
+X X X X X X X X X _ X X X X X X 
+X X X _ X X _ _ X _ _ X X X _ X 
+Grid at generation#10:
+
+X X _ X _ _ _ _ _ X _ _ _ _ X _ 
+X X X X _ _ _ _ _ X _ _ _ _ X X 
+_ X _ X X X _ _ _ X X X X X _ _ 
+
+
+_ X X X X X X _ _ _ _ X X _ _ _ 
+_ X X _ X X X _ X X X X X _ _ _ 
+X X X _ X X X X X X X X _ _ _ _ 
+_ _ X X _ X _ _ _ X X X _ _ _ X 
+_ _ X _ _ X X _ _ _ _ X X X X X 
+
+_ _ _ X X _ _ X _ X _ _ _ X _ X 
+X X X X _ X X _ X X X X X X _ X 
+X _ X X _ X X _ _ _ _ X X X _ X 
+X X X _ _ _ X X _ _ X X X _ X _ 
+X X _ _ _ X X X _ X X X _ X X _ 
+_ X X X X _ _ _ X X X _ _ X _ _ 
+_ X X _ X X _ X X X _ _ _ X _ _ 
+X _ X X X _ _ _ _ X _ _ _ X X _ 
+Grid at generation#20:
+
+X X X _ _ _ _ _ X _ _ _ X X X X 
+X X X X X X _ _ _ _ X X X _ _ X 
+X X X X X X _ _ _ X X X X X X X 
+
+
+X _ X _ X X _ _ _ X _ _ X X X X 
+X _ _ X X X _ X _ X X _ X X X _ 
+X X X X X _ _ X X X X X X X X _ 
+_ _ _ X X X X X _ X X _ X X X X 
+_ _ _ X X X X X _ X X _ X X X _ 
+_ _ _ _ _ X X X X _ X _ X _ X _ 
+
+_ _ _ _ _ _ _ _ _ _ _ _ X X X _ 
+X _ _ _ _ _ _ _ _ _ X X X _ X _ 
+X _ _ _ _ _ _ _ X X X X X X _ X 
+X _ _ _ X X _ _ X X _ _ _ _ _ X 
+_ _ _ _ X _ X _ _ X X X X X _ X 
+_ _ _ _ X _ X _ _ _ X X X X _ _ 
+_ _ _ _ _ _ _ _ X _ _ _ X X _ X 
+Grid at generation#30:
+
+X _ _ _ _ _ _ X X X X _ _ _ X X 
+_ X X _ _ _ X _ X X X _ _ _ X X 
+X X X _ _ X _ X _ _ _ _ _ _ _ X 
+_ X X X _ X X X X X X _ X X X _ 
+
+
+
+_ X X X X X _ X _ X _ _ X X _ _ 
+_ X X X X X X X _ X X _ X _ _ _ 
+X X X X X X _ X X _ X X X X X X 
+X X X X X _ _ X _ X X X _ _ X X 
+X _ X X X X _ X X _ X X X X X X 
+X _ _ _ _ _ X _ X X X _ _ _ X X 
+X X X _ _ _ _ _ X X X X _ _ X X 
+X _ _ X X X X X X X X X X X X X 
+_ X X X X X X X X _ _ X X _ _ _ 
+_ _ X X X X X X X X X X X _ X X 
+X _ _ _ _ X X X X _ _ X X X _ X 
+_ _ X X _ X X _ X X _ _ X X _ _ 
+
+
+Grid at generation#40:
+
+_ X X X _ _ X X X _ _ _ X _ _ _ 
+X X _ X _ X _ X X _ _ X _ X X X 
+X X _ X _ X _ X X X _ _ X X X X 
+_ X _ _ _ X _ X X X X X X _ _ _ 
+
+_ X _ _ X X X X _ _ _ X _ _ _ _ 
+_ X X _ _ _ _ _ X X _ X X _ _ _ 
+_ X X _ _ _ _ _ _ _ _ _ X _ _ _ 
+_ X X _ _ X X _ _ _ _ _ X _ _ _ 
+_ _ _ _ X _ X X X _ _ _ X X _ _ 
+_ _ _ X X X X X _ _ _ _ X X _ _ 
+_ _ _ _ X X X X X _ X X _ X _ _ 
+_ X X _ X X X X X _ _ _ X _ _ _ 
+_ X X X _ X X X _ X X _ X _ _ _ 
+X X X _ _ X X X _ X X X X X X X 
+X X _ _ X X X X _ _ _ X X X X X 
+_ X _ X X _ X X _ _ _ X X X _ _ 
+Grid at generation#50:
+
+
+X X _ X _ _ _ _ X X _ X X _ _ _ 
+X _ X X _ _ _ _ _ X X X _ _ _ X 
+
+
+_ _ _ _ X X _ _ X X X X _ _ _ X 
+_ _ _ X X _ _ _ X _ X X _ _ _ X 
+X _ _ _ X X X X X X X X _ _ _ X 
+X _ _ X X _ _ _ _ _ X _ _ _ _ _ 
+X _ _ X X X X X X X _ _ _ _ X X 
+_ _ _ X X X X X X X _ _ _ _ _ X 
+X X X X X X X _ X _ X X _ _ _ X 
+_ X _ _ _ X X _ _ _ X X _ _ _ _ 
+_ X _ _ X X X X _ _ X X X X _ _ 
+_ _ X _ _ X X X X X X X X _ X X 
+X X X _ _ X X X X _ _ X X X X _ 
+_ _ _ X X _ _ X X _ _ _ X X X X 
+_ _ _ X X X X X X X X X X X _ _ 
+_ _ _ _ X _ X _ _ X X _ X X X X 
+Grid at generation#60:
+
+X _ _ _ _ X X _ _ _ _ X X _ _ _ 
+
+
+X X X X X X _ _ _ _ _ X X _ _ _ 
+X X X X _ X X _ _ _ _ _ X X X _ 
+_ X X _ _ X X X X X X _ _ X X _ 
+_ X _ _ _ _ X X X X X X X X X _ 
+X X X X _ _ X _ _ _ _ _ _ _ X X 
+
+X X X X X _ X X X _ X X _ _ _ X 
+X _ _ _ _ X _ _ _ _ _ X _ _ X X 
+_ X X X X X X X X X X _ _ _ X X 
+_ _ X X X X _ _ _ X X X _ _ X _ 
+_ _ X X X X X _ _ X X X _ _ X _ 
+_ _ X X X X _ _ _ _ X _ X _ X _ 
+X X X X X X X X _ X X X X _ _ X 
+X X _ _ X X _ X X _ X X _ _ _ X 
+_ X _ X _ X X _ X _ X _ X X _ X 
+_ _ X _ X _ X _ _ X X _ X X X X 
+Grid at generation#70:
+
+
+_ _ X X X X X X X X _ _ _ _ _ _ 
+_ X X _ _ X X _ X X _ _ _ _ _ _ 
+X _ X X _ X X X X X _ _ _ _ _ _ 
+
+
+_ X _ _ X X _ X X X _ X _ _ X X 
+X X X X X X X X X X X X _ _ _ _ 
+X _ _ X X X _ X X X X X _ X _ _ 
+X X X X X X X X X _ X _ X X X X 
+X _ _ _ _ X _ X _ _ _ _ _ _ X X 
+X X _ _ X X X X X X X _ _ _ _ _ 
+X X X X X X X X X X X X X _ X _ 
+X _ X X _ _ X X _ X X X _ _ X _ 
+X X X _ _ _ X _ _ X _ _ _ X X _ 
+X X X X X X X X X X X _ _ _ X X 
+X _ _ X X _ _ _ X X X _ _ _ _ _ 
+_ _ X X _ _ _ X _ X X X _ _ _ _ 
+_ X X X _ _ _ _ X _ X X _ _ _ _ 
+Grid at generation#80:
+
+_ _ _ _ _ _ X _ _ _ _ _ _ X _ _ 
+_ X _ _ _ _ _ _ _ _ _ _ _ X X X 
+
+
+_ X _ X X _ X _ _ _ _ _ X _ X X 
+_ X _ X X X X _ _ _ X _ _ X X X 
+_ _ _ X _ X X X X _ X X X X X X 
+
+X _ _ X X _ X X _ _ X X X X X _ 
+X X _ X X _ _ X X X X _ X _ _ _ 
+_ _ _ _ _ _ _ X _ _ X _ _ X X _ 
+X X X X X _ X X _ X _ _ _ _ _ X 
+X X X X X X X X X X _ _ _ _ X X 
+X X X X X X _ X _ _ _ _ _ _ X X 
+_ _ X _ X _ _ _ _ _ _ X X _ X _ 
+_ _ X X X X _ _ _ _ _ _ X X X X 
+_ X X _ X X X _ _ _ _ X _ _ X _ 
+X X _ _ X _ X _ _ _ _ _ X X X X 
+_ _ _ _ X _ X _ X X X _ _ _ _ X 
+Grid at generation#90:
+
+_ _ X X _ X X _ _ _ _ X X _ X _ 
+_ _ X _ X X X _ _ X X _ X _ _ _ 
+
+
+_ _ X X X X X _ X X X X X X X X 
+X X X X _ X X _ X X X X X _ X X 
+X X _ _ X X _ X X X X _ _ X X X 
+_ X _ _ X X _ X X X X X X X X X 
+X X X X X _ _ _ X X X X X X _ X 
+
+X _ _ _ _ _ X X X X X X X X X _ 
+_ _ _ _ _ X X _ _ _ _ _ _ _ X X 
+X _ _ X X _ _ _ _ X X X X _ X _ 
+_ _ _ X X X X X X X X X _ _ X X 
+X X X X X X X X X _ _ _ _ X _ X 
+X _ _ X X _ _ _ X X X X X X X X 
+X _ _ X X _ X _ X X _ X _ _ _ X 
+X _ _ _ _ X X X _ _ _ X X _ _ X 
+X X _ _ _ X X X _ _ _ X _ _ _ _ 
