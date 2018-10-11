@@ -11,8 +11,12 @@
 int elements_per_row;
 int elements_per_subgrid;
 
+struct timeval t1, t2;
+int commtime;
+int commsum;
+
 typedef struct Cell {
-    int status;         // 0 == DEAD, 1 == ALIVE
+    int status;		// DEAD or ALIVE
     int next_status;
 }Cell;
 
@@ -29,8 +33,11 @@ int FindNorthWest(Cell* subgrid, int index, int* top);
 int main(int argc,char *argv[]) {
     int rank,p;
 
-    int n = 16;		// cells per row (grid = n*n)
-    int g = 100;	// # generations
+    commsum = 0;
+    int n = 4;		// cells per row (grid = n*n)
+    int g = 100;		// # generations
+    int gd = g/5;		// used to print only generations/5 outputs to reduce clutter
+    int print = 0;		// switch to 0 if you do not want to print grids (useful for large n values)
     int i;
 
     srand(time(NULL));
@@ -59,22 +66,67 @@ int main(int argc,char *argv[]) {
 
     GenerateInitialGoL(rank, p, n, subgrid);
 
+    struct timeval g1, g2;
+    int gsum = 0, gtime = 0;
     // for each generation:
     for (i = 0; i <= g; i++) {
+	gettimeofday(&g1, NULL);
+	///////////////////////////
+	gettimeofday(&t1, NULL);
     	MPI_Barrier(MPI_COMM_WORLD);
+	gettimeofday(&t2, NULL);
 	Simulate(rank, p, n, subgrid);
 	Update(subgrid);
-	MPI_Barrier(MPI_COMM_WORLD);
+	///////////////////////////
+	gettimeofday(&g2, NULL);
 
-	if  (i % 10 == 0) {
+	gtime += FindTime(g1, g2);
+	commtime += FindTime(t1, t2);
+	gsum++;
+	commsum++;
+
+	if  (i % gd == 0 && print) {
             DisplayGoL(rank, p, n, subgrid, i);
 	}
+    }
+
+
+
+    gtime /= gsum;	// average time for each generation
+    commtime /= commsum;
+
+    //printf("[%d] My communciation time was %d\n", rank, commtime);
+
+    // use MPI gather
+    int* comm_arr;
+    if (rank == 0) {
+        comm_arr = (int*) malloc(p*sizeof(int));
+    }
+    MPI_Gather(&commtime, 1, MPI_INT, comm_arr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        int max_commtime = commtime;
+        for (i = 0; i < p-1; i++) {
+	    //printf("Time at comm_arr[%d] is %d", i, comm_arr[i]);
+	    if (comm_arr[i] > max_commtime) { max_commtime = comm_arr[i]; }
+        }
+	printf("\n\nFinal timings:\n");
+	printf("\tInfo ::: processes = %d, input size = %d, generations = %d\n", p, n, g);
+	printf("\tRuntime = %d microseconds per generation\n", gtime);
+	printf("\tCommunication time = %d microseconds per generation\n", max_commtime);
+	printf("\tTotal computation time = %d microseconds per generation\n", gtime - max_commtime);
     }
 
     MPI_Finalize();
     return 0;
 }
 
+// calculates difference between two times
+int FindTime(struct timeval t1, struct timeval t2) {
+	return (t2.tv_sec-t1.tv_sec)*1000000 + (t2.tv_usec-t1.tv_usec);
+}
+
+// updates the subgrid each generation
 void Update(Cell* subgrid) {
 	int i;
 	for (i = 0; i < elements_per_subgrid; i++) {
@@ -89,7 +141,12 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
             // generate random number
             int random = (rand() % 93563) + 1;
             // MPI SEND random to rank#i
+	    gettimeofday(&t1, NULL);
             MPI_Send(&random, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+	    gettimeofday(&t2, NULL);
+
+	    commtime += FindTime(t1,t2);
+	    commsum++;
         }
 
         // just for rank0, since sending/receiving to itself is pointless
@@ -115,7 +172,12 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
         int random, i;
 	MPI_Status status;
         //	printf("Rank #%d awaiting msg\n", rank);
-   	MPI_Recv(&random,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+   	gettimeofday(&t1, NULL);
+	MPI_Recv(&random,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+        gettimeofday(&t2, NULL);
+
+        commtime += FindTime(t1,t2);
+        commsum++;
 
         for (i = 0; i < elements_per_subgrid; i++) {
             int tmp = (rand() % random) + 1;
@@ -145,13 +207,19 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
       my_bottom[i] = subgrid[elements_per_subgrid - elements_per_row + i].status;	// last row
     }
 
+    gettimeofday(&t1, NULL);
     MPI_Send(my_top,    elements_per_row, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);	// previous rank
     MPI_Send(my_bottom, elements_per_row, MPI_INT, (rank+1)%p,   0, MPI_COMM_WORLD);	// next rank
     //printf("[%d] MPI Sent top and bottom\n", rank);
-
     // receive my top and bottom neighbor's subgrids
     MPI_Recv(bottom, elements_per_row, MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);  // next rank, first row
     MPI_Recv(top, elements_per_row, MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);	// previous rank, last row
+    gettimeofday(&t2, NULL);
+
+    commtime += FindTime(t1,t2);
+    commsum += 4;
+
+
 
     //printf("[%d] MPI Received top/bottom\n", rank);
 
@@ -162,7 +230,7 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 
     //printf("[%d] Barrier up #2\n", rank);
     // block until everybody is ready
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     //printf("[%d] Barrier down #2\n", rank);
 
 
@@ -185,26 +253,17 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
 }
 
 int AnalyzeNeighbors(int rank, Cell* subgrid, Cell* cell, int index, int* top, int* bottom) {
+
     int k = 0;
 
     k += FindNorth(subgrid, index, top);
-    //if (k > 0) { printf("North --- "); sum+=k; k=0;}
     k += FindNorthEast(subgrid, index, top);
-    //if (k > 0) { printf("NorthEast --- "); sum+=k; k=0; }
     k += FindEast(subgrid, index);
-   // if (k > 0) { printf("East --- "); sum+=k; k=0; }
     k += FindSouthEast(subgrid, index, bottom);
-    //if (k > 0) { printf("SouthEast --- "); sum+=k; k=0; }
     k += FindSouth(subgrid, index, bottom);
-    //if (k > 0) { printf("South --- "); sum+=k; k=0; }
     k += FindSouthWest(subgrid, index, bottom);
-    //if (k > 0) { printf("SouthWest --- "); sum+=k; k=0; }
     k += FindWest(subgrid, index);
-    //if (k > 0) { printf("West --- "); sum+=k; k=0; }
     k += FindNorthWest(subgrid, index, top);
-    //if (k > 0) { printf("NorthWest --- "); sum+=k; k=0; }
-
-    //printf("---[%d::%d]---Sum = %d---\n", rank,index, sum);
 
     return k;
 }
@@ -408,8 +467,8 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid, int g) {
 
                 // get remaining processes data into subgrid
                 for (i = 1; i < p; i++) {
+		    // no need to record commtime as this is part of display functionality
                     MPI_Recv(tempgrid, elements_per_subgrid, MPI_INT,i,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-                    //fullgrid[i] = tempgrid;
 
 	            for (j = 0; j < elements_per_subgrid; j++) {
                         fullgrid[i][j] = tempgrid[j];

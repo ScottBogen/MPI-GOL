@@ -1,0 +1,12 @@
+Init Settings:
+-------------
+Number of processes =4
+Grid size n*n = 16
+Subgrid size n*n/p = 4
+
+
+Final timings:
+	Info ::: processes = 4, input size = 4, generations = 100
+	Runtime = 158 microseconds per generation
+	Communication time = 57 microseconds per generation
+	Total computation time = 101 microseconds per generation

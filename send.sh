@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mpirun -np 2 /home/scott.bogen/gol/golo
+mpirun -np 4 /home/scott.bogen/gol/golo
 
