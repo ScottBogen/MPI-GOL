@@ -34,7 +34,7 @@ int main(int argc,char *argv[]) {
     int rank,p;
 
     commsum = 0;
-    int n = 4;		// cells per row (grid = n*n)
+    int n = 512;		// cells per row (grid = n*n)
     int g = 100;		// # generations
     int gd = g/5;		// used to print only generations/5 outputs to reduce clutter
     int print = 0;		// switch to 0 if you do not want to print grids (useful for large n values)
@@ -53,7 +53,7 @@ int main(int argc,char *argv[]) {
     	printf("Subgrid size n*n/p = %d\n", n*n/p);
     }
 
-    assert(p>=2);
+    assert(p>=1);
 
     if (!(n%p==0)) {
         printf("Error: n%p!=0");
