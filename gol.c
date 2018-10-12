@@ -4,9 +4,17 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-
 #define DEAD  0
 #define ALIVE 1
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+*	Note: If there is no Display, make sure the `print` variable 
+*	      is set to 1.
+*
+*/
+
+
 
 int elements_per_row;
 int elements_per_subgrid;
@@ -15,11 +23,12 @@ struct timeval t1, t2;
 int commtime;
 int commsum;
 
+
+// Cell structure which will hold information about each cell in the grid
 typedef struct Cell {
     int status;		// DEAD or ALIVE
     int next_status;
 }Cell;
-
 
 int FindNorth(Cell* subgrid, int index, int* top);
 int FindNorthEast(Cell* subgrid, int index, int* top);
@@ -33,11 +42,13 @@ int FindNorthWest(Cell* subgrid, int index, int* top);
 int main(int argc,char *argv[]) {
     int rank,p;
 
-    commsum = 0;
-    int n = 512;		// cells per row (grid = n*n)
+    commsum = 0;		// stores sum of communication times
+
+    int n = 16;			// cells per row (grid = n*n)
     int g = 100;		// # generations
     int gd = g/5;		// used to print only generations/5 outputs to reduce clutter
-    int print = 0;		// switch to 0 if you do not want to print grids (useful for large n values)
+    int print = 1;		// switch to 0 if you do not want to print grids (useful for large n values)
+
     int i;
 
     srand(time(NULL));
@@ -73,10 +84,10 @@ int main(int argc,char *argv[]) {
 	gettimeofday(&g1, NULL);
 	///////////////////////////
 	gettimeofday(&t1, NULL);
-    	MPI_Barrier(MPI_COMM_WORLD);
+    	MPI_Barrier(MPI_COMM_WORLD);	// block
 	gettimeofday(&t2, NULL);
-	Simulate(rank, p, n, subgrid);
-	Update(subgrid);
+	Simulate(rank, p, n, subgrid);  // sim 
+	Update(subgrid);		// update
 	///////////////////////////
 	gettimeofday(&g2, NULL);
 
@@ -86,7 +97,7 @@ int main(int argc,char *argv[]) {
 	commsum++;
 
 	if  (i % gd == 0 && print) {
-            DisplayGoL(rank, p, n, subgrid, i);
+            DisplayGoL(rank, p, n, subgrid, i);	// display
 	}
     }
 
@@ -95,7 +106,6 @@ int main(int argc,char *argv[]) {
     gtime /= gsum;	// average time for each generation
     commtime /= commsum;
 
-    //printf("[%d] My communciation time was %d\n", rank, commtime);
 
     // use MPI gather
     int* comm_arr;
@@ -134,7 +144,9 @@ void Update(Cell* subgrid) {
 	}
 }
 
+// board init
 void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
+    // rank 0 distributes seed
     if (rank==0) {
 	int i;
         for (i = 1; i < p; i++) {
@@ -171,7 +183,7 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
         // others wait for MPI receive
         int random, i;
 	MPI_Status status;
-        //	printf("Rank #%d awaiting msg\n", rank);
+
    	gettimeofday(&t1, NULL);
 	MPI_Recv(&random,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
         gettimeofday(&t2, NULL);
@@ -179,6 +191,7 @@ void GenerateInitialGoL(int rank, int p, int n, Cell* subgrid) {
         commtime += FindTime(t1,t2);
         commsum++;
 
+	// populate subgrid
         for (i = 0; i < elements_per_subgrid; i++) {
             int tmp = (rand() % random) + 1;
             if (tmp%2) {
@@ -197,20 +210,27 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
     int i, j;
 
     MPI_Status status;
+	// top row of subgrid
     int* my_top    = (int*) calloc(elements_per_row, sizeof(int));
+	// bottom row of subgrid
     int* my_bottom = (int*) calloc(elements_per_row, sizeof(int));
+	// top row of next rank
     int* top       = (int*) calloc(elements_per_row, sizeof(int));
+	// bottom row of prior rank
     int* bottom    = (int*) calloc(elements_per_row, sizeof(int));
 
+
+    // populate top/bottom
     for (i = 0; i < elements_per_row; i++) {
       my_top[i] = subgrid[i].status;							// first row
       my_bottom[i] = subgrid[elements_per_subgrid - elements_per_row + i].status;	// last row
     }
 
     gettimeofday(&t1, NULL);
+    // send away top/bottom
     MPI_Send(my_top,    elements_per_row, MPI_INT, (rank-1+p)%p, 0, MPI_COMM_WORLD);	// previous rank
     MPI_Send(my_bottom, elements_per_row, MPI_INT, (rank+1)%p,   0, MPI_COMM_WORLD);	// next rank
-    //printf("[%d] MPI Sent top and bottom\n", rank);
+
     // receive my top and bottom neighbor's subgrids
     MPI_Recv(bottom, elements_per_row, MPI_INT,(rank+1)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);  // next rank, first row
     MPI_Recv(top, elements_per_row, MPI_INT,(rank-1+p)%p,MPI_ANY_TAG,MPI_COMM_WORLD,&status);	// previous rank, last row
@@ -220,22 +240,11 @@ void Simulate(int rank, int p, int n, Cell* subgrid) {
     commsum += 4;
 
 
-
-    //printf("[%d] MPI Received top/bottom\n", rank);
-
-    //for (j = 0; j < elements_per_row; j++) {
-    //    printf("[%d] Testing top[%d]: %d\n",rank, j, top[j]);
-    //}
-
-
-    //printf("[%d] Barrier up #2\n", rank);
-    // block until everybody is ready
-    //MPI_Barrier(MPI_COMM_WORLD);
-    //printf("[%d] Barrier down #2\n", rank);
-
-
+    // ready to do the neighbor math
     for (i = 0; i < n*n/p; i++) {
+      // sum stores the number of living neighbors
       int sum = AnalyzeNeighbors(rank, subgrid, &subgrid[i], i, top, bottom);
+      // see if we're living or dying
       if (sum < 3 || sum > 5) {
         subgrid[i].next_status = DEAD;
       }
@@ -256,6 +265,7 @@ int AnalyzeNeighbors(int rank, Cell* subgrid, Cell* cell, int index, int* top, i
 
     int k = 0;
 
+    // run through each neighbor
     k += FindNorth(subgrid, index, top);
     k += FindNorthEast(subgrid, index, top);
     k += FindEast(subgrid, index);
@@ -269,7 +279,7 @@ int AnalyzeNeighbors(int rank, Cell* subgrid, Cell* cell, int index, int* top, i
 }
 
 
-// FIRST CALL:
+// FIRST CALL (example):
 // subgrid = [ cell0, cell1, ...]
 // i = 0
 // top = {1,0,1,0,0,0,0,0}
@@ -293,14 +303,12 @@ int FindNorthEast(Cell* subgrid, int i, int* top) {
 
 
     if (i < elements_per_row) {     // at north border
-       // printf("A\n");
+
         if ((i+1) % elements_per_row == 0) { // at east border
             temp = top[i -elements_per_row + 1];
-       //     printf("B\n");
         }
         else {
             temp = top[i+1];
-       //     printf("C = %d\n", temp);
         }
     }
 
@@ -448,19 +456,17 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid, int g) {
 	int fullgrid[p][elements_per_subgrid];	// array to hold all subgrids
 	int tempgrid[elements_per_subgrid];
 
-	if (rank==0) {
 
+	// populate fullgrid
+	if (rank==0) {
 	 	for (i = 0; i < elements_per_subgrid; i++) {
                     tempgrid[i] = subgrid[i].status;
                 }
 
                 // add that tempgrid to the fullgrid
                 for (j = 0; j < elements_per_subgrid; j++) {
-		    fullgrid[0][j] = tempgrid[j]; 
+		    fullgrid[0][j] = tempgrid[j];
 		}
-
-		//fullgrid[0] = tempgrid;
-		//memcpy(fullgrid[0], tempgrid, sizeof(int) * elements_per_subgrid);
 
                 // clear tempgrid;
                 memset(tempgrid, 0, sizeof(int) * elements_per_subgrid);
@@ -474,12 +480,10 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid, int g) {
                         fullgrid[i][j] = tempgrid[j];
                     }
 
-                    //memcpy(fullgrid[i], tempgrid, sizeof(int) * elements_per_subgrid);
 		    memset(tempgrid, 0, sizeof(int) * elements_per_subgrid);
                 }
 
                 // fullgrid is now filled up, let's print it out now
-
 		printf("Full grid at generation #%d:", g);
 		for (j = 0; j < p; j++) {
 			for (i = 0; i < elements_per_subgrid; i++) {
@@ -496,6 +500,7 @@ void DisplayGoL(int rank, int p, int n, Cell* subgrid, int g) {
 
         }
 
+	// for the other ranks (non 0)
         // rank x (from 1 to p-1) will package its contents into a handy array and send the array to rank0 
         else {
                 int tempgrid[elements_per_subgrid];
