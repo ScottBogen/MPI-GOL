@@ -1,6 +1,6 @@
 Init Settings:
 -------------
-Number of processes =16
+Number of processes = 16
 Grid size n*n = 65536
 Subgrid size n*n/p = 4096
 

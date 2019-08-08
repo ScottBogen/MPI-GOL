@@ -1,6 +1,6 @@
 Init Settings:
 -------------
-Number of processes =2
+Number of processes = 2
 Grid size n*n = 256
 Subgrid size n*n/p = 128
 Full grid at generation #0:

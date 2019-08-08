@@ -1,6 +1,6 @@
 Init Settings:
 -------------
-Number of processes =4
+Number of processes = 4
 Grid size n*n = 16
 Subgrid size n*n/p = 4
 
